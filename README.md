@@ -55,214 +55,113 @@ Basic Setup Instructions
         The API will be available at http://localhost:8000.
 
 API Documentation
-Base URL
-Copy
+# Laravel API for Order Management
 
-http://localhost:8000/api
+This is a simple Laravel application that handles order management with a basic approval workflow. All API routes are prefixed with `/api`.
 
-1. Create an Order
+## API Endpoints
 
-    Endpoint: POST /orders
+### 1. **Create an Order (POST /api/orders)**
 
-    Description: Creates a new order with items and calculates the total amount.
+Creates a new order with multiple items.
 
-    Request Body:
-    json
-    Copy
+**Request:**
+```sh
+curl -X POST http://localhost:8000/api/orders \
+     -H "Content-Type: application/json" \
+     -d '{
+           "items": [
+               {"product_name": "Laptop", "quantity": 1, "price": 1200},
+               {"product_name": "Mouse", "quantity": 2, "price": 50}
+           ]
+         }'
 
-    {
-        "items": [
-            {
-                "product_name": "Product A",
-                "quantity": 2,
-                "price": 100
-            },
-            {
-                "product_name": "Product B",
-                "quantity": 1,
-                "price": 200
-            }
-        ]
-    }
+Response:
 
-    Response:
-    json
-    Copy
+    201 Created: Order created successfully
+    400 Bad Request: Invalid input
 
-    {
-        "id": 1,
-        "order_number": "ORD-000001",
-        "total_amount": 400,
-        "status": "pending",
-        "created_at": "2023-10-10T12:00:00.000000Z",
-        "updated_at": "2023-10-10T12:00:00.000000Z",
-        "items": [
-            {
-                "id": 1,
-                "order_id": 1,
-                "product_name": "Product A",
-                "quantity": 2,
-                "price": 100,
-                "created_at": "2023-10-10T12:00:00.000000Z",
-                "updated_at": "2023-10-10T12:00:00.000000Z"
-            },
-            {
-                "id": 2,
-                "order_id": 1,
-                "product_name": "Product B",
-                "quantity": 1,
-                "price": 200,
-                "created_at": "2023-10-10T12:00:00.000000Z",
-                "updated_at": "2023-10-10T12:00:00.000000Z"
-            }
-        ]
-    }
+2. Get All Orders (GET /api/orders)
 
-2. View an Order
+Fetches a list of all orders.
 
-    Endpoint: GET /orders/{order_id}
+Request:
 
-    Description: Retrieves details of a specific order, including items and history.
+curl -X GET http://localhost:8000/api/orders
 
-    Response:
-    json
-    Copy
+Response:
 
-    {
-        "id": 1,
-        "order_number": "ORD-000001",
-        "total_amount": 400,
-        "status": "pending",
-        "created_at": "2023-10-10T12:00:00.000000Z",
-        "updated_at": "2023-10-10T12:00:00.000000Z",
-        "items": [
-            {
-                "id": 1,
-                "order_id": 1,
-                "product_name": "Product A",
-                "quantity": 2,
-                "price": 100,
-                "created_at": "2023-10-10T12:00:00.000000Z",
-                "updated_at": "2023-10-10T12:00:00.000000Z"
-            },
-            {
-                "id": 2,
-                "order_id": 1,
-                "product_name": "Product B",
-                "quantity": 1,
-                "price": 200,
-                "created_at": "2023-10-10T12:00:00.000000Z",
-                "updated_at": "2023-10-10T12:00:00.000000Z"
-            }
-        ],
-        "history": [
-            {
-                "id": 1,
-                "order_id": 1,
-                "status": "pending",
-                "changed_by": "system",
-                "created_at": "2023-10-10T12:00:00.000000Z",
-                "updated_at": "2023-10-10T12:00:00.000000Z"
-            }
-        ]
-    }
+    200 OK: Returns an array of all orders
 
-3. Approve an Order
+3. Get a Single Order by ID (GET /api/orders/{id})
 
-    Endpoint: POST /orders/{order_id}/approve
+Fetches an order by its ID.
 
-    Description: Approves a pending order.
+Request:
 
-    Request Body:
-    json
-    Copy
+curl -X GET http://localhost:8000/api/orders/1
 
-    {
-        "changed_by": "admin"
-    }
+Response:
 
-    Response:
-    json
-    Copy
+    200 OK: Returns the details of the order with the given ID
+    404 Not Found: Order with the given ID does not exist
 
-    {
-        "id": 1,
-        "order_number": "ORD-000001",
-        "total_amount": 400,
-        "status": "approved",
-        "created_at": "2023-10-10T12:00:00.000000Z",
-        "updated_at": "2023-10-10T12:00:00.000000Z",
-        "items": [
-            {
-                "id": 1,
-                "order_id": 1,
-                "product_name": "Product A",
-                "quantity": 2,
-                "price": 100,
-                "created_at": "2023-10-10T12:00:00.000000Z",
-                "updated_at": "2023-10-10T12:00:00.000000Z"
-            },
-            {
-                "id": 2,
-                "order_id": 1,
-                "product_name": "Product B",
-                "quantity": 1,
-                "price": 200,
-                "created_at": "2023-10-10T12:00:00.000000Z",
-                "updated_at": "2023-10-10T12:00:00.000000Z"
-            }
-        ],
-        "history": [
-            {
-                "id": 1,
-                "order_id": 1,
-                "status": "pending",
-                "changed_by": "system",
-                "created_at": "2023-10-10T12:00:00.000000Z",
-                "updated_at": "2023-10-10T12:00:00.000000Z"
-            },
-            {
-                "id": 2,
-                "order_id": 1,
-                "status": "approved",
-                "changed_by": "admin",
-                "created_at": "2023-10-10T12:00:00.000000Z",
-                "updated_at": "2023-10-10T12:00:00.000000Z"
-            }
-        ]
-    }
+4. Approve an Order (PUT /api/orders/{id}/approval)
 
-4. Error Responses
+Approves an order. Orders above $1000 require approval.
 
-    Validation Errors:
-    json
-    Copy
+Request:
 
-    {
-        "message": "The items field is required.",
-        "errors": {
-            "items": [
-                "The items field is required."
-            ]
-        }
-    }
+curl -X PUT http://localhost:8000/api/orders/1/approval \
+     -H "Content-Type: application/json" \
+     -d '{
+           "approved": true
+         }'
 
-    Order Already Approved:
-    json
-    Copy
+Response:
 
-    {
-        "message": "Order cannot be approved."
-    }
+    200 OK: Order approved successfully
+    400 Bad Request: Invalid approval status or other validation issues
+    404 Not Found: Order with the given ID does not exist
 
-Testing
+5. Delete an Order (DELETE /api/orders/{id})
 
-    Run unit tests:
-    bash
-    Copy
+Deletes an order by its ID.
 
-    php artisan test
+Request:
 
-    Use Postman or cURL to test the API endpoints.
+curl -X DELETE http://localhost:8000/api/orders/1
 
-This setup and documentation should help you get started with the order approval workflow system. Let me know if you need further assistance!
+Response:
+
+    200 OK: Order deleted successfully
+    404 Not Found: Order with the given ID does not exist
+
+6. Get Order History (GET /api/orders/{id}/history)
+
+Fetches the history of an order (e.g., status changes, approval).
+
+Request:
+
+curl -X GET http://localhost:8000/api/orders/1/history
+
+Response:
+
+    200 OK: Returns the history of the order with the given ID
+    404 Not Found: Order with the given ID does not exist
+
+Testing API with Postman
+
+You can test these endpoints using Postman:
+
+    Open Postman and select the desired HTTP method (POST, GET, PUT, DELETE).
+    Enter the full API URL (e.g., http://localhost:8000/api/orders).
+    Under Headers, add Content-Type: application/json.
+    Under Body (for POST and PUT), select raw and choose JSON.
+    Click Send to make the request.
+
+Notes
+
+    All API routes are prefixed with /api.
+    The API requires a running Laravel instance on http://localhost:8000.
+    Ensure that your application is running and migrations are applied before using these routes.

@@ -1,10 +1,9 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use App\Models\Order;
-use App\Services\OrderService;
 use Illuminate\Http\Request;
+use App\Services\OrderService;
+use Illuminate\Http\JsonResponse;
 
 class OrderController extends Controller
 {
@@ -15,29 +14,44 @@ class OrderController extends Controller
         $this->orderService = $orderService;
     }
 
-    public function store(Request $request)
+    public function createOrder(Request $request): JsonResponse
     {
-        $request->validate([
-            'items' => 'required|array|min:1',
-            'items.*.product_name' => 'required|string',
-            'items.*.quantity' => 'required|integer|min:1',
-            'items.*.price' => 'required|numeric|min:0',
-        ]);
+        try {
 
-        $order = $this->orderService->createOrder($request->all());
-        return response()->json($order, 201);
+            $order = $this->orderService->createOrder($request->all());
+            return response()->json(['status' => true, 'message' => 'Order created successfully', 'data' => $order], 201);
+        } catch (\Exception $e) {
+            return response()->json(['status' => false, 'message' => $e->getMessage()], 500);
+        }
     }
 
-    public function show(Order $order)
+    public function getAllOrders(): JsonResponse
     {
-        return response()->json($order->load('items', 'history'));
+        return response()->json(['status' => true, 'data' => $this->orderService->getAllOrders()]);
     }
 
-    public function approve(Order $order, Request $request)
+    public function getOrder($id): JsonResponse
     {
-        $request->validate(['changed_by' => 'required|string']);
+        return response()->json(['status' => true, 'data' => $this->orderService->getOrderById($id)]);
+    }
 
-        $this->orderService->approveOrder($order, $request->changed_by);
-        return response()->json($order);
+    public function processApproval($id): JsonResponse
+    {
+        try {
+            $order = $this->orderService->approveOrder($id);
+            return response()->json(['status' => true, 'message' => 'Order approved successfully', 'data' => $order]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => false, 'message' => $e->getMessage()], 400);
+        }
+    }
+
+    public function deleteOrder($id): JsonResponse
+    {
+        try {
+            $this->orderService->deleteOrder($id);
+            return response()->json(['status' => true, 'message' => 'Order deleted successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['status' => false, 'message' => $e->getMessage()], 400);
+        }
     }
 }

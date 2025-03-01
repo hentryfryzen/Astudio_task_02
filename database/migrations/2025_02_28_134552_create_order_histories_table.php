@@ -20,6 +20,17 @@ class CreateOrderHistoriesTable extends Migration
             $table->string('changed_by');
             $table->timestamps();
         });
+
+        Schema::create('order_status_changes', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('order_id')->constrained()->onDelete('cascade');
+            $table->string('old_status');
+            $table->string('new_status');
+            $table->timestamp('changed_at')->useCurrent();
+            $table->timestamps();
+
+        });
+
     }
 
     /**
@@ -30,5 +41,7 @@ class CreateOrderHistoriesTable extends Migration
     public function down()
     {
         Schema::dropIfExists('order_histories');
+        Schema::dropIfExists('order_status_changes');
+
     }
 }

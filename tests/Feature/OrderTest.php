@@ -1,13 +1,14 @@
 <?php
 
-
 namespace Tests\Feature;
 
-use App\Models\Order;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 class OrderTest extends TestCase
 {
+    use RefreshDatabase; // Refresh the database between tests
+
     public function test_create_order()
     {
         $response = $this->postJson('/api/orders', [
